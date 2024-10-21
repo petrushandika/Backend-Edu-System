@@ -13,19 +13,74 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id    Int     @default(autoincrement()) @id
-  email String  @unique
-  name  String?
-  posts Post[]
+  id        Int      @id @default(autoincrement())
+  fullName  String
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Lecturer     Lecturer?
+  Student      Student?
+  Announcement Announcement[]
 }
 
-model Post {
-  id        Int      @default(autoincrement()) @id
-  title     String
-  content   String?
-  published Boolean? @default(false)
-  author    User?    @relation(fields: [authorId], references: [id])
-  authorId  Int?
+model Schedule {
+  id         Int      @id @default(autoincrement())
+  day        String
+  startTime  DateTime
+  endTime    DateTime
+  subjectId  Int
+  lecturerId Int
+  createdAt  DateTime @default(now())
+
+  Subject  Subjects @relation(fields: [subjectId], references: [id])
+  Lecturer Lecturer @relation(fields: [lecturerId], references: [id])
+}
+
+model Subjects {
+  id          Int     @id @default(autoincrement())
+  name        String
+  code        String  @unique
+  description String?
+
+  schedules Schedule[]
+}
+
+model Lecturer {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @unique
+  department String
+  createdAt  DateTime @default(now())
+
+  user      User       @relation(fields: [userId], references: [id])
+  schedules Schedule[]
+}
+
+model Student {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @unique
+  enrollmentYear Int
+  major          String
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Announcement {
+  id       Int      @id @default(autoincrement())
+  title    String
+  content  String
+  postedBy Int
+  postedAt DateTime @default(now())
+
+  author User @relation(fields: [postedBy], references: [id])
+}
+
+enum Role {
+  ADMIN
+  LECTURER
+  STUDENT
 }
