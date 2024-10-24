@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -15,72 +9,103 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  fullName  String
+  name      String
+  phone     String?
   email     String   @unique
   password  String
   role      Role
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  Lecturer     Lecturer?
-  Student      Student?
-  Announcement Announcement[]
+  lecturer     Lecturer? // One-to-one relation (only if the role is LECTURER)
+  student      Student? // One-to-one relation (only if the role is STUDENT)
+  announcement Announcement[] // One user can have multiple announcements
 }
 
 model Schedule {
-  id         Int      @id @default(autoincrement())
-  day        String
-  startTime  DateTime
-  endTime    DateTime
-  subjectId  Int
-  lecturerId Int
-  createdAt  DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  day         String
+  image       String
+  title       String
+  description String
+  code        String
+  startTime   DateTime
+  endTime     DateTime
+  subjectId   Int
+  lecturerId  Int
+  createdAt   DateTime @default(now())
 
-  Subject  Subjects @relation(fields: [subjectId], references: [id])
-  Lecturer Lecturer @relation(fields: [lecturerId], references: [id])
+  subject  Subject  @relation(fields: [subjectId], references: [id])
+  lecturer Lecturer @relation(fields: [lecturerId], references: [id])
+  // schedule Schedule[] // notes: schedule must be have multiple subject
+  // lecturer Lecturer[] // notes: schedule must be have multiple lecturer
 }
 
-model Subjects {
-  id          Int     @id @default(autoincrement())
-  name        String
-  code        String  @unique
-  description String?
+model Subject {
+  id          Int      @id @default(autoincrement())
+  image       String
+  title       String
+  description String
+  category    String
+  timePost    DateTime @default(now())
+  likes       Int      @default(0)
+  createdAt   DateTime @default(now())
 
-  schedules Schedule[]
+  schedule Schedule[] // One subject can have multiple schedules
+  student  Student[]  @relation("StudentSubject") // Many-to-many with students
 }
 
 model Lecturer {
-  id         Int      @id @default(autoincrement())
-  userId     Int      @unique
-  department String
-  createdAt  DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  createdAt DateTime @default(now())
 
-  user      User       @relation(fields: [userId], references: [id])
-  schedules Schedule[]
+  user     User       @relation(fields: [userId], references: [id])
+  schedule Schedule[] // A lecturer can have multiple schedules
 }
 
 model Student {
-  id             Int      @id @default(autoincrement())
-  userId         Int      @unique
-  enrollmentYear Int
-  major          String
-  createdAt      DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  userId      Int      @unique
+  npm         Int
+  class       Class
+  status      Status
+  information String?
+  createdAt   DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id])
+  user    User      @relation(fields: [userId], references: [id])
+  subject Subject[] @relation("StudentSubject") // Many-to-many with subjects
 }
 
 model Announcement {
-  id       Int      @id @default(autoincrement())
-  title    String
-  content  String
-  postedBy Int
-  postedAt DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  time        DateTime @default(now())
+  userId      Int
+  createdAt   DateTime @default(now())
 
-  author User @relation(fields: [postedBy], references: [id])
+  user User @relation(fields: [userId], references: [id])
 }
 
 enum Role {
   ADMIN
   LECTURER
   STUDENT
+}
+
+enum Status {
+  ACTIVE
+  ON_LEAVE
+  INACTIVE
+  TRANSFERRED
+  OTHER
+}
+
+enum Class {
+  REGULAR
+  EXTENSION
+  REPEATING
+  TRANSFER
+  OTHER
 }
