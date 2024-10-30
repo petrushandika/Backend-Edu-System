@@ -1,4 +1,4 @@
-import { IsString, IsInt, IsDate } from 'class-validator';
+import { IsString, IsDate, IsInt, IsOptional } from 'class-validator';
 
 export class CreateScheduleDto {
   @IsString()
@@ -16,15 +16,17 @@ export class CreateScheduleDto {
   @IsString()
   code: string;
 
-  @IsString()
-  startTime: string;
+  @IsDate()
+  @IsOptional()
+  startTime?: Date;
 
-  @IsString()
-  endTime: string;
+  @IsDate()
+  @IsOptional()
+  endTime?: Date;
 
-  //   @IsInt()
-  //   subjectId: number;
+  @IsInt()
+  subjectId: number;
 
-  //   @IsInt()
-  //   lecturerId: number;
+  @IsInt()
+  lecturerId: number;
 }
