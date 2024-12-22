@@ -5,10 +5,10 @@ import { UpdateScheduleDto } from './dto/update-schedule.dto';
 
 @Injectable()
 export class ScheduleService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prismaService: PrismaService) {}
 
   async createSchedule(createScheduleDto: CreateScheduleDto) {
-    return await this.prisma.schedule.create({
+    return await this.prismaService.schedule.create({
       data: {
         ...createScheduleDto,
         startTime: createScheduleDto.startTime ?? new Date(),
@@ -18,24 +18,24 @@ export class ScheduleService {
   }
 
   async findAll() {
-    return await this.prisma.schedule.findMany();
+    return await this.prismaService.schedule.findMany();
   }
 
   async findOne(id: number) {
-    return await this.prisma.schedule.findUnique({
+    return await this.prismaService.schedule.findUnique({
       where: { id },
     });
   }
 
   async update(id: number, updateScheduleDto: UpdateScheduleDto) {
-    return await this.prisma.schedule.update({
+    return await this.prismaService.schedule.update({
       where: { id },
       data: updateScheduleDto,
     });
   }
 
   async remove(id: number) {
-    return await this.prisma.schedule.delete({
+    return await this.prismaService.schedule.delete({
       where: { id },
     });
   }

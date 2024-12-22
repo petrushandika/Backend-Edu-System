@@ -9,9 +9,11 @@ import { AuthenticationMiddleware } from './middlewares/authentication.middlewar
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ScheduleModule } from './schedule/schedule.module';
+import { SubjectModule } from './subject/subject.module';
+import { LecturerModule } from './lecturer/lecturer.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, UserModule, ScheduleModule],
+  imports: [PrismaModule, AuthModule, UserModule, ScheduleModule, SubjectModule, LecturerModule],
   controllers: [],
   providers: [],
 })
